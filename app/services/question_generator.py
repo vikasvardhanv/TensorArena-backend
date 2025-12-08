@@ -138,10 +138,21 @@ from torch.utils.data import DataLoader, TensorDataset
              * "# To test: Click 'Run Code' button above" at the bottom
            - Make it beginner-friendly with helpful hints
            
-        6. **Answer and Explanation**:
-           - Provide the BEST and SIMPLEST solution for the problem.
-           - Provide a very simple, easy-to-understand explanation of the logic.
-           - Avoid complex theory; explain it like you would to a beginner.
+        6. **Answer and Explanation** (CRITICAL):
+           - The 'answer' field MUST contain:
+             * Complete, working Python code that solves the problem
+             * Clean, readable code with meaningful variable names
+             * The SIMPLEST solution that works (not the most optimal, but easiest to understand)
+             * Code should be production-ready and follow best practices
+
+           - The 'explanation' field MUST contain:
+             * A simple, beginner-friendly explanation (as if explaining to someone new to programming)
+             * Use plain English, avoid jargon and complex terminology
+             * Break down the approach into simple steps (use numbered lists)
+             * Explain WHY the solution works, not just WHAT it does
+             * Include time/space complexity in simple terms (e.g., "We loop through the list once, so it's fast")
+             * Maximum 4-5 sentences or bullet points - keep it concise
+             * Use markdown formatting for readability
         
         User Context: {user_context or 'First-time user'}
         
