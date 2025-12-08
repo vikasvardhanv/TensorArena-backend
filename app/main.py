@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from app.services.question_generator import QuestionGenerator
+from app.services.code_executor import CodeExecutor
 
 app = FastAPI(
     title="AI LeetCode Platform API",
@@ -20,11 +21,15 @@ app.add_middleware(
 
 
 question_generator = QuestionGenerator()
+code_executor = CodeExecutor(timeout=5)
 
 class GenerateRequest(BaseModel):
     topic: str
     difficulty: str
     user_context: str = None
+
+class ExecuteCodeRequest(BaseModel):
+    code: str
 
 @app.get("/")
 async def root():
@@ -43,5 +48,13 @@ async def generate_question(request: GenerateRequest):
             request.user_context
         )
         return question
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/execute_code")
+async def execute_code(request: ExecuteCodeRequest):
+    try:
+        result = code_executor.execute_python(request.code)
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
