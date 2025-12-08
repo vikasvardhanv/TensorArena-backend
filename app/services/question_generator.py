@@ -10,6 +10,8 @@ class Question(BaseModel):
     topic: str
     test_cases: List[str]
     solution_template: str
+    answer: str
+    explanation: str
 
 class QuestionGenerator:
     def __init__(self):
@@ -135,6 +137,11 @@ from torch.utils.data import DataLoader, TensorDataset
              * "# Example: result = your_function(test_input)" after the function
              * "# To test: Click 'Run Code' button above" at the bottom
            - Make it beginner-friendly with helpful hints
+           
+        6. **Answer and Explanation**:
+           - Provide the BEST and SIMPLEST solution for the problem.
+           - Provide a very simple, easy-to-understand explanation of the logic.
+           - Avoid complex theory; explain it like you would to a beginner.
         
         User Context: {user_context or 'First-time user'}
         
@@ -145,7 +152,9 @@ from torch.utils.data import DataLoader, TensorDataset
             "difficulty": "{difficulty}",
             "topic": "{topic}",
             "test_cases": ["list", "of", "strings"],
-            "solution_template": "python code string starting with imports"
+            "solution_template": "python code string starting with imports",
+            "answer": "complete python solution code",
+            "explanation": "simple markdown string explaining the solution"
         }}
         
         IMPORTANT: The solution_template MUST include the imports provided above at the start.
