@@ -15,3 +15,5 @@ venv/
 .idea/
 .vscode/
 *.log
+ROLE_BASED_QUESTIONS.md
+test_role_questions.py
