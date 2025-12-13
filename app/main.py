@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from app.services.question_generator import QuestionGenerator
 from app.services.code_executor import CodeExecutor
 from app.services.role_question_generator import RoleBasedQuestionGenerator
+from app.services.system_design_service import SystemDesignService
 
 app = FastAPI(
     title="AI LeetCode Platform API",
@@ -24,6 +25,8 @@ app.add_middleware(
 question_generator = QuestionGenerator()
 code_executor = CodeExecutor(timeout=5)
 role_question_generator = RoleBasedQuestionGenerator()
+mentor_service = MentorService()
+system_design_service = SystemDesignService()
 
 class GenerateRequest(BaseModel):
     topic: str
@@ -150,5 +153,30 @@ async def grade_submission(request: GradeRequest):
             request.question_description
         )
         return grading
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class MentorChatRequest(BaseModel):
+    message: str
+    history: list = []
+
+@app.post("/mentor/chat")
+async def mentor_chat(request: MentorChatRequest):
+    try:
+        response = await mentor_service.chat(request.message, request.history)
+        return {"response": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+class SystemDesignChatRequest(BaseModel):
+    message: str
+    history: list = []
+    topic: str = "General System Design"
+
+@app.post("/system-design/chat")
+async def system_design_chat(request: SystemDesignChatRequest):
+    try:
+        response = await system_design_service.chat(request.message, request.history, request.topic)
+        return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
