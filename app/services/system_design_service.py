@@ -8,7 +8,7 @@ class SystemDesignService:
             print("Warning: GEMINI_API_KEY not found in environment")
             
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-        self.model = genai.GenerativeModel('gemini-1.5-pro')
+        self.model = genai.GenerativeModel('gemini-2.5-flash')
         
     async def chat(self, message: str, history: List[Dict[str, str]], topic: str = "General System Design") -> str:
         """
