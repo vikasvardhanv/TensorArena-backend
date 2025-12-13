@@ -5,6 +5,9 @@ from app.services.question_generator import QuestionGenerator
 from app.services.code_executor import CodeExecutor
 from app.services.role_question_generator import RoleBasedQuestionGenerator
 from app.services.system_design_service import SystemDesignService
+from app.services.mentor_service import MentorService
+from app.services.deepgram_service import DeepgramService
+from app.services.mock_interview_service import MockInterviewService
 
 app = FastAPI(
     title="AI LeetCode Platform API",
@@ -180,3 +183,27 @@ async def system_design_chat(request: SystemDesignChatRequest):
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+deepgram_service = DeepgramService()
+mock_interview_service = MockInterviewService()
+
+@app.get("/deepgram/token")
+async def get_deepgram_token():
+    return await deepgram_service.get_token()
+
+class MockInterviewChatRequest(BaseModel):
+    message: str
+    history: list = []
+    topic: str = "General"
+
+@app.post("/mock-interview/chat")
+async def mock_interview_chat(request: MockInterviewChatRequest):
+    try:
+        response = await mock_interview_service.chat(request.message, request.history, request.topic)
+        return {"response": response}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
