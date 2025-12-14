@@ -108,7 +108,53 @@ class MLService:
                 feature_importance = dict(zip(X.columns, model.feature_importances_))
             elif hasattr(model, "coef_"):
                 # For linear models, take abs of coefs
-                feature_importance = dict(zip(X.columns, np.abs(model.coef_[0])))
+                if model.coef_.ndim > 1:
+                     feature_importance = dict(zip(X.columns, np.abs(model.coef_[0])))
+                else:
+                     feature_importance = dict(zip(X.columns, np.abs(model.coef_)))
+            
+            # --- Visualization Data Preparation ---
+            visualization = {}
+            if len(X.columns) >= 2:
+                # 1. Identify Top 2 Features
+                sorted_features = sorted(feature_importance.items(), key=lambda item: item[1], reverse=True)
+                # Fallback if feature importance is empty or all zeros (rare but possible)
+                if not sorted_features:
+                    top_features = X.columns[:2].tolist()
+                else:
+                    top_features = [k for k, v in sorted_features[:2]]
+                
+                # 2. Sample Data for Plotting (max 200 points from Test set)
+                # We reuse X_test and y_test, and y_pred
+                sample_size = min(200, len(X_test))
+                
+                # We need to ensure we are using the original values for plotting, not dummies if possible
+                # But here X is already encoded. We'll plot the encoded values which is correct for the model.
+                
+                # Convert to list of dicts
+                viz_data = []
+                # Reset index to make iteration easy
+                X_test_sample = X_test[top_features].iloc[:sample_size].reset_index(drop=True)
+                y_test_sample = y_test.iloc[:sample_size].reset_index(drop=True)
+                y_pred_sample = y_pred[:sample_size] # y_pred is already numpy array
+                
+                for i in range(sample_size):
+                    val_x = float(X_test_sample.iloc[i][0])
+                    val_y = float(X_test_sample.iloc[i][1])
+                    true_label = int(y_test_sample.iloc[i]) if isinstance(y_test_sample.iloc[i], (int, np.integer)) else str(y_test_sample.iloc[i])
+                    pred_label = int(y_pred_sample[i]) if isinstance(y_pred_sample[i], (int, np.integer)) else str(y_pred_sample[i])
+                    
+                    viz_data.append({
+                        "x": val_x,
+                        "y": val_y,
+                        "label": true_label,
+                        "prediction": pred_label
+                    })
+
+                visualization = {
+                    "features": top_features,
+                    "data": viz_data
+                }
 
             return {
                 "metrics": {
@@ -117,6 +163,7 @@ class MLService:
                     "confusion_matrix": cm
                 },
                 "feature_importance": feature_importance,
+                "visualization": visualization,
                 "model_type": model_type
             }
 
