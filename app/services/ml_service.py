@@ -58,7 +58,21 @@ class MLService:
 
             X = df.drop(columns=[target_column])
             y = df[target_column]
+
+            # --- Data Cleaning: Remove ID-like columns ---
+            # 1. Drop columns with "id" in their name (case-insensitive)
+            cols_to_drop = [c for c in X.columns if 'id' in c.lower()]
+            # 2. Drop high-cardinality string columns (likely identifiers)
+            for col in X.select_dtypes(include=['object', 'string']).columns:
+                if col not in cols_to_drop:
+                    # If unique count is > 90% of row count, it's likely an ID
+                    if X[col].nunique() > 0.9 * len(X):
+                        cols_to_drop.append(col)
             
+            if cols_to_drop:
+                # print(f"Dropping ID-like columns: {cols_to_drop}") # Logging for debug
+                X = X.drop(columns=cols_to_drop)
+
             # Simple encoding for categorical features if any
             X = pd.get_dummies(X, drop_first=True)
             
